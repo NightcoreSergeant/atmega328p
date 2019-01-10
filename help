@@ -1,0 +1,39 @@
+.org 0x0
+rjmp setup
+
+.org OVF1addr
+jmp prekinitev
+
+.org 0x34
+
+setup:
+	sbi ddrb,5
+	sbi portb,5
+
+lds r16, TIMSK1
+ori r16,1<<TOIE1
+sts TIMSK1,r16
+
+lds r16, TCCR1B
+andi r16,0b11111000
+ori r16,0b00000101
+sts TCCR1B,r16
+sei
+main:
+	
+	nop
+
+	rjmp main
+
+prekinitev:
+	sbic portb,5
+	rjmp ugasni
+
+prizgi:
+	sbi portb,5
+	reti
+
+ugasni:	
+   cbi portb,5
+   reti
+

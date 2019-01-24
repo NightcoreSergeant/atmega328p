@@ -36,4 +36,70 @@ prizgi:
 ugasni:	
    cbi portb,5
    reti
+;
+;
+;
+;NOV PROGRAM
+;must use timer 2!!! because of sleep mode...stinks because of 8-bit register
+
+.org 0x0
+rjmp RESET
+
+.org 0x0012
+jmp prekinitev
+
+.org 0x34
+
+RESET:
+	cbi ddrb,5
+	cbi portb,5
+
+lds r16, TIMSK2 ;enable overflow interupt
+ori r16,1<<TOIE2
+sts TIMSK2,r16
+
+lds r16, TCCR2B  ;prescaler
+andi r16,0b11111000
+ori r16,0b00000010
+sts TCCR1B,r16
+
+;lds r16,0x55;BOD dissable
+;andi r16,0b10011111
+;ori r16,0b01100000
+;sts 0x55,r16
+
+lds r16,0x53 ;sleep mode
+andi r16,0b11110000
+ori r16,0b00000111
+sts 0x53,r16
+ldi r20,0xff
+;lds r31,portb
+sei
+
+main:
+	nop
+;	sleep
+	nop
+	rjmp main
+
+prekinitev:
+	dec r20
+	cpi r20,0x0
+	brne return
+	sbic portb,5
+	;cp r31,0b
+
+	rjmp ugasni
+
+prizgi:
+	sbi portb,5
+	reti
+
+ugasni:	
+	cbi portb,5
+	reti
+
+return:
+	reti
+ 
 

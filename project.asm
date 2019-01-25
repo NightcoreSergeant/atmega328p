@@ -1,67 +1,71 @@
 .org 0x0
-jmp RESET
+rjmp RESET
 
-.org 0x001a
-jmp TIMER1_OVF
+.org OVF2addr
+jmp prekinitev
 
-.org 0x034
+.org 0x34
+
 RESET:
-	jmp start
+	sbi ddrb,5
+	sbi portb,5
+in r16,0x5
+lds r16, TIMSK2
+ori r16,1<<TOIE2
+sts TIMSK2,r16
 
-TIMER1_OVF:
-    cpi r17,0x0
-    breq IF
-    dec r17
-	cbi portb, 5
-    reti
-IF:
-	jmp end_task
-
-
-.org 0x100
-
-start: 
-sbi ddrb,5
-sbi portb, 5
-
-
-cli
-in r16,0x33
+lds r16, TCCR2B
+andi r16,0b11111000
 ori r16,0b00000111
-;ldi r16,0b00000111 ;value for sleep mode...last bit enable sleep mode
-out 0x33,r16 ;address to SMCR-sleep mode control register 0x33(0x55)
-;system clock;ldi r17,0b100001000 ;value for prescale clock (clk/256)
-;sysetm clock;sts 0x61, r17 ;address to CLKPR – Clock Prescale Register
+sts TCCR2B,r16
 
-;ldi r16,0b0110000 ;value for BOD disable-BODS and BODSE
-in r16,0x35
-ori r16,0b0110000
-out 0x35,r16 ;address to MCUCR
+ldi r30,0xff
+ldi r31,0x29 ;final
 
-;ldi r16,0b00000101 ;value for prescale clock(1) (clk/1024)
-;ldi r16,0b00000001 ;value for prescale clock(1)
-lds r16,0x81
-ori r16,0b00000001
-sts 0x81,r16;address to TC1 Control Register B-TCCR1B
 
-;ldi r16,0b00100111 ;value for Timer/Counter 1 Interrupt Mask Register TIMSK1 (enable overflow interrupts and A,B comparison) 
-;sts 0x6f,r16 ;address to Timer/Counter 1 Interrupt Mask Register
-lds r16, TIMSK1
-ori r16,1<<TOIE1
-sts TIMSK1,r16
+lds r16,0x53 ;sleep mode
+andi r16,0b11110000
+ori r16,0b00000010
+sts 0x53,r16
 
-ldi r17,0x29;value to decrese for pretty acurate time (a day)
+sei
 
-loop:
+
+main:
 	sei
-    sbi ddrb,5
 	sleep
-    rjmp loop
+	rjmp main
 
-end_task:
-    cli
-    nop ;some magic to open electricity
-    jmp RESET
+prekinitev:
+	cli
+	dec r30
+	cpi r30,0x0
+	brne weit1
+	
+	;dec r31
+	;cpi r31,0x0
+	;breq weit2
+	
+	
+	ldi r30,0xff
+	
+	in r16,0x5 
+	cpi r16,0b0
+	breq prizgi
+	rjmp ugasni 
 
 
+weit1:
+	reti
 
+;weit2:
+;	rjmp RESET
+
+prizgi:
+	sbi portb,5
+	reti
+
+ugasni:
+;	rjmp RESET
+   cbi portb,5
+   reti

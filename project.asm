@@ -2,7 +2,7 @@
 rjmp RESET
 
 .org OVF2addr
-jmp prekinitev
+jmp overflow2
 
 .org 0x34
 
@@ -46,7 +46,7 @@ main:
 	sleep
 	rjmp main
 
-prekinitev:
+overflow2:
 	cli
 	dec r31
 	cpi r31,0x0    ;weiting for 4sec

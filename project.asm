@@ -49,38 +49,37 @@ main:
 prekinitev:
 	cli
 	dec r31
-	cpi r31,0x0    ;cakanje na 4sec
+	cpi r31,0x0    ;weiting for 4sec
 	brne weit
 	
 	ldi r31,0xff
 	
-;	dec r30
-;	cpi r30,0x0 ;cakanje na okol 17min
-;	brne weit
+	dec r30
+	cpi r30,0x0 ;weiting for half an hour
+	brne weit
 	
-;	ldi r30,0xff
+	ldi r30,0xff
 
-;	dec r29
-;	cpi r29,0x0 ;waiting whole day
-;	brne weit
+	dec r29
+	cpi r29,0x0 ;waiting whole day
+	brne weit
 
-;	ldi r29,0x54
+	ldi r29,0x54
 
 
 	in r16,0x5 
 	cpi r16,0b0
-	breq prizgi
-	rjmp ugasni 
+	breq open
+	rjmp close 
 
 
 weit:
 	reti
 
-prizgi:
+open:
 	sbi portb,5
 	reti
 
-ugasni:
-;	rjmp RESET
+close:
    cbi portb,5
    reti

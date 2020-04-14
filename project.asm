@@ -49,20 +49,20 @@ main:
 overflow2:
 	cli
 	dec r31
-	cpi r31,0x0    ;weiting for 4sec
-	brne weit
+	cpi r31,0x0    ;waiting for 4sec
+	brne wait
 	
 	ldi r31,0xff
 	
 	dec r30
-	cpi r30,0x0 ;weiting for half an hour
-	brne weit
+	cpi r30,0x0 ;waiting for half an hour
+	brne wait
 	
 	ldi r30,0xff
 
 	dec r29
 	cpi r29,0x0 ;waiting whole day
-	brne weit
+	brne wait
 
 	ldi r29,0x54
 
@@ -73,7 +73,7 @@ overflow2:
 	rjmp close 
 
 
-weit:
+wait:
 	reti
 
 open:
